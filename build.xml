@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NOTE the base directory -->
+<project name="15boilerplate" default="run" basedir=".">
+
+	<!-- where is the WAR directory going? -->
+	<property name="war.dir" value="public" />
+	<!-- where are all the libraries? -->
+	<property name="libs.dir" value="libs" />
+	<!-- on what port will the server run? -->
+	<property name="port" value="8800" />
+	<!-- where are the Java sources? -->
+	<property name="src.dir" value="app" />
+	<!-- where are the views? -->
+	<property name="views.dir" value="views" />
+	<!-- and any configuration files? -->
+	<property name="config.dir" value="conf" />
+
+	<!-- define a path to the JAR files -->
+	<path id="all-jars">
+		<fileset dir="${libs.dir}/">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- the master path for the entire application -->
+	<path id="master-path">
+		<!-- add the JAR files -->
+		<path refid="all-jars" />
+		<!-- add any config files to the classpath -->
+		<pathelement path="${conf.dir}"/>
+		<!-- add the views to the classpath -->
+		<pathelement path="${views.dir}"/>
+	</path>
+
+	<!-- because Git will not commit empty folders -->
+	<target name="git-fix">
+		<!-- recreate the WAR directory -->
+		<mkdir dir="${war.dir}" />
+		<mkdir dir="${war.dir}/WEB-INF" />
+		<mkdir dir="${war.dir}/WEB-INF/classes" />
+		<mkdir dir="${war.dir}/WEB-INF/lib" />
+	</target>
+
+	<!-- compile the server-side stuff -->
+	<target name="compile" depends="git-fix">
+		<delete>
+			<fileset dir="." includes="**/*.class" />
+		</delete>
+		<javac debug="true" includeantruntime="false" srcdir="${src.dir}" destdir="${war.dir}/WEB-INF/classes">
+			<classpath>
+				<path refid="all-jars" />
+			</classpath>
+			<compilerarg value="-Xlint:all"/>
+		</javac>
+	</target>
+
+	<target name="run"  depends="compile">
+		<!-- update the web XML file in the WAR dir -->
+		<exec executable="python" failonerror="true">
+			<arg line="${config.dir}/web.xml.py -i ${config.dir}/urls.json -o ${war.dir}/WEB-INF/web.xml" />
+		</exec>
+		<!-- run the server -->
+		<java classname="com.whymarrh.boilerplate.JettyServer" fork="true">
+			<classpath path="${war.dir}/WEB-INF/classes">
+				<path refid="master-path" />
+			</classpath>
+			<arg value="${port}" />
+			<!-- WAR directory -->
+			<arg value="${war.dir}" />
+			<!-- root context -->
+			<arg value="/" />
+		</java>
+	</target>
+
+	<target name="clean">
+		<delete dir="${war.dir}/WEB-INF" />
+		<delete>
+			<fileset dir="." includes="**/*.class" />
+		</delete>
+	</target>
+
+</project>
