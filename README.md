@@ -61,6 +61,6 @@ Folder Structure
 View Rendering
 --------------
 
-Use the [jmustache library by Sam Sikvert][1] to render views dynamically.
+Use the [jmustache library by Sam Skivert][1] to render views dynamically.
 
   [1]:https://github.com/samskivert/jmustache
