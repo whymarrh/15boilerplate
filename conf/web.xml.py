@@ -35,5 +35,5 @@ if __name__ == "__main__":
 	parser.add_argument("--help", action = "help", help = "show this help message and exit")
 	parser.add_argument("-i", dest = "ifile", help = "input URLs file", default = "urls.json")
 	parser.add_argument("-o", dest = "ofile", help = "output mappings file", default = "web.xml")
-	parser.add_argument("--version", action = "version", version = "2013.05.23")
+	parser.add_argument("--version", action = "version", version = "2013.05.24")
 	main(parser.parse_args())
